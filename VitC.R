@@ -3,7 +3,10 @@ library(ggplot2)
 library(tidyverse)
 library(dplyr)
 
-
+jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
+ema = "your path"
+df = read.csv2(jakob)
+rm(jakob,ema)
 # 1
 # outcome
 
@@ -12,20 +15,20 @@ library(dplyr)
 # 2
 
 #summary
-summary(VitCGroup7)
+summary(df)
 
 #simple point plot of data
-ggplot(data = VitCGroup7) +
+ggplot(data = df) +
   aes(x = Setmana, y = VitaminaC, color = Tractament) +
     geom_point()
 
 # Correlation between Vitamin and Week
-cor(x = VitCGroup7$VitaminaC, y = VitCGroup7$Setmana)
+cor(x = df$VitaminaC, y = df$Setmana)
 
 #summary of the data grouped by treatment
-summary(VitCGroup7 %>% filter(Tractament == "a"))
-summary(VitCGroup7 %>% filter(Tractament == "b"))
-summary(VitCGroup7 %>% filter(Tractament == "c"))
+summary(df %>% filter(Tractament == "a"))
+summary(df %>% filter(Tractament == "b"))
+summary(df %>% filter(Tractament == "c"))
 
 
 # thoughts
@@ -51,9 +54,9 @@ summary(VitCGroup7 %>% filter(Tractament == "c"))
 #4
 
 # (1)
-mod1 = glm( VitaminaC ~ Setmana, data = VitCGroup7, family = "poisson" )
+mod1 = glm( VitaminaC ~ Setmana, data = df, family = "poisson" )
 summary(mod1)
 
 # (2)
-mod2 = glm( VitaminaC ~ Setmana*Tractament, data = VitCGroup7, family = "poisson" )
+mod2 = glm( VitaminaC ~ Setmana*Tractament, data = df, family = "poisson" )
 summary(mod2)
