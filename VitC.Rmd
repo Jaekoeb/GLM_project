@@ -101,11 +101,11 @@ summary(mod2)
 
 ```
 
-## 5) Find the best normal linear model you can with a systematic component as in Equation (1). Use residual analysis to check that the assumptions of the model are satisfied. Explain how good your model is using metrics such as adjusted R^2, explaining what they mean in context.
+## 6) Find the best normal linear model you can with a systematic component as in Equation (1). Use residual analysis to check that the assumptions of the model are satisfied. Explain how good your model is using metrics such as adjusted R^2, explaining what they mean in context.
 
 ```{r}
 
 ```
 
 
-## 6) Explain the main conclusions of your analysis in approximately half a page. In particular, answer the questions you asked yourself in part 3). Keep technical jargon to a minimum: your conclusions should be understood by your point of contact at the juice company, who may not know or like statistics all that much.
+## 7) Explain the main conclusions of your analysis in approximately half a page. In particular, answer the questions you asked yourself in part 3). Keep technical jargon to a minimum: your conclusions should be understood by your point of contact at the juice company, who may not know or like statistics all that much.
