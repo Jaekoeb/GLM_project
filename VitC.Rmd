@@ -1,0 +1,111 @@
+---
+title: "Vitc"
+output: html_document
+date: "2022-12-02"
+---
+
+##To create a new "code area" : Ctrl + Alt + i or just copy the ones I've done :)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r lib, echo=FALSE}
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+```
+
+Text
+```{r load_data, echo=FALSE}
+jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
+ema = "C:/Users/emaca/OneDrive/Documents/INSA/4A/Linear and Generalized Linear Models/Assignment/VitCGroup7.csv"
+
+df = read.csv2(ema)
+rm(jakob,ema)
+```
+
+## 1) To fit a normal linear model with a systematic component as described in Equation (1), what would be your outcome and predictors? Justify your answer.
+
+ANSWER
+
+## 2) Perform an exploratory data analysis. What are your main conclusions?
+```{r sum, echo=T}
+summary(df)
+```
+
+
+```{r plt_data, echo=T}
+#simple point plot of data
+ggplot(data = df) +
+  aes(x = Setmana, y = VitaminaC, color = Tractament) +
+    geom_point()
+```
+
+```{r cor, echo=T}
+# Correlation between Vitamin and Week
+cor(x = df$VitaminaC, y = df$Setmana)
+```
+
+```{r sum_treatment, echo=T}
+#summary of the data grouped by treatment
+summary(df %>% filter(Tractament == "a"))
+summary(df %>% filter(Tractament == "b"))
+summary(df %>% filter(Tractament == "c"))
+```
+
+Thoughts :
+
+simple summary shows: Vitamin C concentration varies a lot,
+max is 5 times the min, also IQR is 17.22
+
+plot of data shows: VitC concentration decreases over time,
+treatment a and b appear similar while c seems to have higher concentration
+
+Correlation of weeks and concentration is -0.86, very strong correlation
+
+summary of each treatment: treatment a and b are quite similar, c seems to differ
+
+## 3) Think about three questions that the company producing the juice may have that you will be able to answer with your analysis.
+
+Possible questions :
+Is any treatment significantly better than the others?
+By how much does Vitamin C concentration decrease per week?
+
+
+
+## 4) (1) Fit a model with the assumption that the concentration of Vitamin C at the time of packaging (week 0) does not depend on the conservation method.
+## - Report your estimations of the βi and interpret them in context.
+## - Are the βi significantly different to each other or not? Interpret what it means that the βi are significantly different or not in context (i.e. how would you explain this to your point of contact at the juice company?).
+
+```{r 4.1, echo=F}
+mod1 = glm( VitaminaC ~ Setmana, data = df, family = "poisson" )
+summary(mod1)
+```
+
+## 4) (2) Fit a model with the assumption that the effect of week depends on the conservation method.
+## - Report your estimations of the βi and interpret them in context.
+## - Are the βi significantly different to each other or not? Interpret what it means that the βi are significantly different or not in context (i.e. how would you explain this to your point of contact at the juice company?).
+
+```{r 4.2, echo=F}
+mod2 = glm( VitaminaC ~ Setmana*Tractament, data = df, family = "poisson" )
+summary(mod2)
+```
+
+## 5) Fit a model that does not assume that the treatments have the same Vitamin C concentration at the time of packaging. Then,
+## - For each treatment, estimate the vitamin C concentration at the time of packaging.
+## - Test whether there is evidence to claim that the treatments have different concentrations of Vitamin C at the time of packaging. Interpret your results.
+
+```{r}
+
+```
+
+## 5) Find the best normal linear model you can with a systematic component as in Equation (1). Use residual analysis to check that the assumptions of the model are satisfied. Explain how good your model is using metrics such as adjusted R^2, explaining what they mean in context.
+
+```{r}
+
+```
+
+
+## 6) Explain the main conclusions of your analysis in approximately half a page. In particular, answer the questions you asked yourself in part 3). Keep technical jargon to a minimum: your conclusions should be understood by your point of contact at the juice company, who may not know or like statistics all that much.
