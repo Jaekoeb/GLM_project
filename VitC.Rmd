@@ -28,7 +28,11 @@ rm(jakob,ema)
 
 ## 1) To fit a normal linear model with a systematic component as described in Equation (1), what would be your outcome and predictors? Justify your answer.
 
-ANSWER
+Outcome : Concentration of vitamin C in the orange juice
+
+Predictors : 
+- Conservation method (column "Tractament" : a, b or c) which is a categorical variable
+- Week of measurement (column "Setmana" from 1 to 12) 
 
 ## 2) Perform an exploratory data analysis. What are your main conclusions?
 ```{r sum, echo=T}
@@ -61,11 +65,12 @@ simple summary shows: Vitamin C concentration varies a lot,
 max is 5 times the min, also IQR is 17.22
 
 plot of data shows: VitC concentration decreases over time,
-treatment a and b appear similar while c seems to have higher concentration
+- The vitamin C concentration with treatment a and b decreases linearly as the weeks pass by 
+- Treatment c seems to maintain a higher concentration than a and b after the 4th week 
 
-Correlation of weeks and concentration is -0.86, very strong correlation
+Correlation of weeks and concentration is -0.86, very strong correlation, this verifies the assumption we made from the plot
 
-summary of each treatment: treatment a and b are quite similar, c seems to differ
+summary of each treatment: treatment a and b are quite similar, c seems to differ. Comparing the means and medians confirms the assumption we made from the plot (treatment c maintains a higher concentration than a and b)
 
 ## 3) Think about three questions that the company producing the juice may have that you will be able to answer with your analysis.
 
