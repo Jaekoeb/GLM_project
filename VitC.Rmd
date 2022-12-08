@@ -58,9 +58,8 @@ cor(x = df$VitaminaC, y = df$Setmana)
 ```
 
 ## 3) Think about three questions that the company producing the juice may have that you will be able to answer with your analysis.
-
-Possible questions :
-Is any treatment significantly better than the others?
+Is any treatment significantly better than the others in terms of VitC concentration?
+Does the Vitamin C concentration differ at packaging for different treatments?
 By how much does Vitamin C concentration decrease per week?
 
 
@@ -80,9 +79,17 @@ $$
 With : $\alpha_i = e^{\beta_0.week}$
 
 
-```{r 4.1, echo=F}
+```{r 4.1}
 mod1 = glm( VitaminaC ~ Setmana, data = df, family = "poisson" )
+alpha = exp(mod1[["coefficients"]][["(Intercept)"]])
+beta = mod1[["coefficients"]][["Setmana"]]
+exp.beta = exp(beta)
 summary(mod1)
+cbind(alpha, beta, exp.beta)
+```
+Here we only have one value each for alpha and beta as we do not consider different treatments. Alpha is interpreted as the predicted VitC concentration at week 0. Beta is best interpreted as follows: For each additional week the VitC concentration decreases by 1-exp.beta percent. In our case this means each week VitC concentration falls by 10.4 percent. Both alpha and beta are highly significant. Here we plotted the model:
+```{r}
+effect_plot(mod1, pred = Setmana, plot.points = T)
 ```
 
 
@@ -91,11 +98,30 @@ summary(mod1)
 ## - Report your estimations of the βi and interpret them in context.
 ## - Are the βi significantly different to each other or not? Interpret what it means that the βi are significantly different or not in context (i.e. how would you explain this to your point of contact at the juice company?).
 
-We fit a multiplicative generalized linear model to the data taking the week of measurement and the conservation method as parameters.
+We fit a multiplicative generalized linear model to the data taking the week of measurement and the conservation method as parameters. This model will also consider the interactions between our predictors.
 
-```{r 4.2, echo=F}
+```{r 4.2}
 mod2 = glm( VitaminaC ~ Setmana*Tractament, data = df, family = "poisson" )
 summary(mod2)
+
+#creating array of different alpha values
+int = mod2[["coefficients"]][["(Intercept)"]]
+alpha = exp(c(int, int+mod2[["coefficients"]][["Tractamentb"]], int+mod2[["coefficients"]][["Tractamentc"]]))
+
+#creating array of different beta values
+set = mod2[["coefficients"]][["Setmana"]]
+beta = c(set, set+mod2[["coefficients"]][["Setmana:Tractamentb"]], set+mod2[["coefficients"]][["Setmana:Tractamentc"]])
+
+exp.beta = exp(beta)
+
+rbind(alpha,beta, exp.beta)
+
+```
+Now we have different alpha and beta values for each treatment. The interpretation is similar to above. The alpha values tell us the predicted VitC concentration at week 0 for each treatment. So alpha[1]=43.73 is the predicted VitC concentration for treatment A. The Betas are best interpreted as follows: For each additional week the VitC concentration decreases by 1-exp.beta percent. So we predict that each week the Vit C concentration falls by 1-exp.beta[1] = 12.17 percent for treatment A. Note that most of the interactions are not statistically significant. Only the influence of treatment C on the beta is significant. By statistically significant we mean that assuming the influence to be nothing it is very unlikely that we would observe the data the way it is. As we actually did observe the result we should reject the premise that the influence was zero. Below we plotted the model:
+
+```{r}
+interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T,
+              point.size = 3)
 ```
 
 INTERPRETATION OF THE $\beta_i$
