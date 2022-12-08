@@ -4,8 +4,6 @@ output: html_document
 date: "2022-12-02"
 ---
 
-##To create a new "code area" : Ctrl + Alt + i or just copy the ones I've done :)
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 ```
@@ -15,6 +13,8 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 library(ggplot2)
 library(tidyverse)
 library(dplyr)
+library(interactions)
+library(jtools)
 ```
 
 Text
@@ -22,11 +22,11 @@ Text
 jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
 ema = "C:/Users/emaca/OneDrive/Documents/INSA/4A/Linear and Generalized Linear Models/Assignment/VitCGroup7.csv"
 
-df = read.csv2(ema)
+df = read.csv2(jakob)
 rm(jakob,ema)
 ```
 
-## 1) To fit a normal linear model with a systematic component as described in Equation (1), what would be your outcome and predictors? Justify your answer.
+## 1)
 
 Outcome : Concentration of vitamin C in the orange juice
 
@@ -34,7 +34,7 @@ Predictors :
 - Conservation method (column "Tractament" : a, b or c) which is a categorical variable
 - Week of measurement (column "Setmana" from 1 to 12) 
 
-## 2) Perform an exploratory data analysis. What are your main conclusions?
+## 2)
 
 The data is very evenly spread out, with each week containing 6 observations and each treatment containing 24 observations. Generally we can see that Vitamin C concentration varies a lot. For example the maximum is 5 times the minimum value. Also the interquartile range is 17.22 which is quite high considering the magnitude of values involved.
 ```{r sum}
@@ -57,26 +57,20 @@ The correlation between the Vitamin C concentration and the time in weeks is a s
 cor(x = df$VitaminaC, y = df$Setmana)
 ```
 
-## 3) Think about three questions that the company producing the juice may have that you will be able to answer with your analysis.
+## 3)
 Is any treatment significantly better than the others in terms of VitC concentration?
 Does the Vitamin C concentration differ at packaging for different treatments?
 By how much does Vitamin C concentration decrease per week?
 
 
 
-## 4) (1) Fit a model with the assumption that the concentration of Vitamin C at the time of packaging (week 0) does not depend on the conservation method.
-## - Report your estimations of the βi and interpret them in context.
-## - Are the βi significantly different to each other or not? Interpret what it means that the βi are significantly different or not in context (i.e. how would you explain this to your point of contact at the juice company?).
-
-
+## 4.1)
 To answer this question, we fit a generalized linear model to the data taking only the week of measurement as parameter. We use Poisson's family to fit the data and we consider $\beta_0$ as the intercept.
 
 $$
-VitaminC_i = e^{\left(\beta_0 -\beta_i\right).week}
-\Leftrightarrow
-VitaminC_i = \alpha_i e^{-\beta_i.week} 
+VitaminC_i = e^{\beta_0 + \beta .week} = \alpha e^{\beta .week}
 $$
-With : $\alpha_i = e^{\beta_0.week}$
+With : $\alpha = e^{\beta_0}$ and $\beta_0$ the intercept.
 
 
 ```{r 4.1}
@@ -94,11 +88,13 @@ effect_plot(mod1, pred = Setmana, plot.points = T)
 
 
 
-## 4) (2) Fit a model with the assumption that the effect of week depends on the conservation method.
-## - Report your estimations of the βi and interpret them in context.
-## - Are the βi significantly different to each other or not? Interpret what it means that the βi are significantly different or not in context (i.e. how would you explain this to your point of contact at the juice company?).
-
+## 4.2)
 We fit a multiplicative generalized linear model to the data taking the week of measurement and the conservation method as parameters. This model will also consider the interactions between our predictors.
+
+$$
+VitaminC_i = e^{\gamma_i + \beta_i .week} = \alpha_i e^{\beta_i .week}
+$$
+With $i \in \{1,2,3\}$ for each treatment.
 
 ```{r 4.2}
 mod2 = glm( VitaminaC ~ Setmana*Tractament, data = df, family = "poisson" )
@@ -126,55 +122,53 @@ interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T,
 
 INTERPRETATION OF THE $\beta_i$
 
-## 5) Fit a model that does not assume that the treatments have the same Vitamin C concentration at the time of packaging. Then,
-## - For each treatment, estimate the vitamin C concentration at the time of packaging.
-## - Test whether there is evidence to claim that the treatments have different concentrations of Vitamin C at the time of packaging. Interpret your results.
+## 5)
 
 ```{r}
 
 ```
 
-## 6) Find the best normal linear model you can with a systematic component as in Equation (1). Use residual analysis to check that the assumptions of the model are satisfied. Explain how good your model is using metrics such as adjusted R^2, explaining what they mean in context.
+## 6)
 
-We can choose the best linear model by comparing the $R^2$, the mean square errors (MSE) and the Akaike Information Criterion (AIC)
-```{r}
-bmod =
-```
+<!-- We can choose the best linear model by comparing the $R^2$, the mean square errors (MSE) and the Akaike Information Criterion (AIC) -->
+<!-- ```{r} -->
+<!-- bmod =  -->
+<!-- ``` -->
 
-```{r}
-#Response residual
-df$resp_resid = residuals(bmod, type = "response")
-ggplot(df) +
-  aes(x = resp_resid) +
-    geom_histogram()
-```
+<!-- ```{r} -->
+<!-- #Response residual -->
+<!-- df$resp_resid = residuals(bmod, type = "response") -->
+<!-- ggplot(df) + -->
+<!--   aes(x = resp_resid) + -->
+<!--     geom_histogram() -->
+<!-- ``` -->
 
-```{r}
-mean(df$resp_resid > 0)
-```
+<!-- ```{r} -->
+<!-- mean(df$resp_resid > 0) -->
+<!-- ``` -->
 
-```{r}
-mean(df$resp_resid < 0)
-```
-
-
-```{r}
-#Pearson residual
-df$resp_resid = residuals(bmod, type = "pearson")
-ggplot(df) +
-  aes(x = resp_resid) +
-    geom_histogram()
-```
+<!-- ```{r} -->
+<!-- mean(df$resp_resid < 0) -->
+<!-- ``` -->
 
 
-```{r}
-#Deviance residual
-df$resp_resid = residuals(bmod)
-ggplot(df) +
-  aes(x = resp_resid) +
-    geom_histogram()
-```
+<!-- ```{r} -->
+<!-- #Pearson residual -->
+<!-- df$resp_resid = residuals(bmod, type = "pearson") -->
+<!-- ggplot(df) + -->
+<!--   aes(x = resp_resid) + -->
+<!--     geom_histogram() -->
+<!-- ``` -->
 
-For interpretation check Lec7_sol.html
 
-## 7) Explain the main conclusions of your analysis in approximately half a page. In particular, answer the questions you asked yourself in part 3). Keep technical jargon to a minimum: your conclusions should be understood by your point of contact at the juice company, who may not know or like statistics all that much.
+<!-- ```{r} -->
+<!-- #Deviance residual -->
+<!-- df$resp_resid = residuals(bmod) -->
+<!-- ggplot(df) + -->
+<!--   aes(x = resp_resid) + -->
+<!--     geom_histogram() -->
+<!-- ``` -->
+
+<!-- For interpretation check Lec7_sol.html -->
+
+## 7)
