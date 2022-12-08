@@ -7,18 +7,18 @@ date: "2022-12-02"
 ##To create a new "code area" : Ctrl + Alt + i or just copy the ones I've done :)
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 ```
 
 
-```{r lib, echo=FALSE}
+```{r lib}
 library(ggplot2)
 library(tidyverse)
 library(dplyr)
 ```
 
 Text
-```{r load_data, echo=FALSE}
+```{r load_data}
 jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
 ema = "C:/Users/emaca/OneDrive/Documents/INSA/4A/Linear and Generalized Linear Models/Assignment/VitCGroup7.csv"
 
@@ -35,42 +35,27 @@ Predictors :
 - Week of measurement (column "Setmana" from 1 to 12) 
 
 ## 2) Perform an exploratory data analysis. What are your main conclusions?
-```{r sum, echo=T}
-summary(df)
+
+The data is very evenly spread out, with each week containing 6 observations and each treatment containing 24 observations. Generally we can see that Vitamin C concentration varies a lot. For example the maximum is 5 times the minimum value. Also the interquartile range is 17.22 which is quite high considering the magnitude of values involved.
+```{r sum}
+summary(df$VitaminaC)
 ```
 
-
-```{r plt_data, echo=T}
+A plot of the data shows that there seems to be a decrease VitC concentration over time. Treatment A and B appear to yield very similar results, while treatment C seems to yield higher VitC concentrations.
+- The vitamin C concentration with treatment a and b decreases linearly as the weeks pass by 
+- Treatment c seems to maintain a higher concentration than a and b after the 4th week 
+```{r plt_data}
 #simple point plot of data
 ggplot(data = df) +
   aes(x = Setmana, y = VitaminaC, color = Tractament) +
     geom_point()
 ```
 
-```{r cor, echo=T}
+The correlation between the Vitamin C concentration and the time in weeks is a strong negative correlation at -0.86. This confirms our eyeballed observation earlier.
+```{r cor}
 # Correlation between Vitamin and Week
 cor(x = df$VitaminaC, y = df$Setmana)
 ```
-
-```{r sum_treatment, echo=T}
-#summary of the data grouped by treatment
-summary(df %>% filter(Tractament == "a"))
-summary(df %>% filter(Tractament == "b"))
-summary(df %>% filter(Tractament == "c"))
-```
-
-Thoughts :
-
-simple summary shows: Vitamin C concentration varies a lot,
-max is 5 times the min, also IQR is 17.22
-
-plot of data shows: VitC concentration decreases over time,
-- The vitamin C concentration with treatment a and b decreases linearly as the weeks pass by 
-- Treatment c seems to maintain a higher concentration than a and b after the 4th week 
-
-Correlation of weeks and concentration is -0.86, very strong correlation, this verifies the assumption we made from the plot
-
-summary of each treatment: treatment a and b are quite similar, c seems to differ. Comparing the means and medians confirms the assumption we made from the plot (treatment c maintains a higher concentration than a and b)
 
 ## 3) Think about three questions that the company producing the juice may have that you will be able to answer with your analysis.
 
