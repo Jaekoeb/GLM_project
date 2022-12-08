@@ -4,8 +4,10 @@ output: html_document
 date: "2022-12-02"
 ---
 
+##To create a new "code area" : Ctrl + Alt + i or just copy the ones I've done :)
+
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
@@ -13,28 +15,19 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 library(ggplot2)
 library(tidyverse)
 library(dplyr)
-library(interactions)
-library(jtools)
 ```
 
-
-```{r load_data}
+Text
+```{r load_data, echo=FALSE}
 jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
 ema = "C:/Users/emaca/OneDrive/Documents/INSA/4A/Linear and Generalized Linear Models/Assignment/VitCGroup7.csv"
 
-df = read.csv2(jakob)
+df = read.csv2(ema)
 rm(jakob,ema)
 ```
 
-## 1)
-In this case the outcome would be the Vitamin C concentration as it is the value that we want to analyze the effect on and later predict. Our predictors are the week and the conservation method. These two variables have an effect on the Vitamin C concentration.
+## 1) To fit a normal linear model with a systematic component as described in Equation (1), what would be your outcome and predictors? Justify your answer.
 
-<<<<<<< HEAD
-## 2)
-The data is very evenly spread out, with each week containing 6 observations and each treatment containing 24 observations. Generally we can see that Vitamin C concentration varies a lot. For example the maximum is 5 times the minimum value. Also the interquartile range is 17.22 which is quite high considering the magnitude of values involved.
-```{r sum}
-summary(df$VitaminaC)
-=======
 Outcome : Concentration of vitamin C in the orange juice
 
 Predictors : 
@@ -44,29 +37,28 @@ Predictors :
 ## 2) Perform an exploratory data analysis. What are your main conclusions?
 ```{r sum, echo=T}
 summary(df)
->>>>>>> 9782c93305a8b28844656bac4862a2271bc1689a
 ```
 
-A plot of the data shows that there seems to be a decrease VitC concentration over time. Treatment A and B appear to yield very similar results, while treatment C seems to yield higher VitC concentrations.
-```{r plt_data}
+
+```{r plt_data, echo=T}
 #simple point plot of data
 ggplot(data = df) +
   aes(x = Setmana, y = VitaminaC, color = Tractament) +
     geom_point()
 ```
 
-The correlation between the Vitamin C concentration and the time in weeks is a strong negative correlation at -0.86. This confirms our eyeballed observation earlier.
-```{r cor}
+```{r cor, echo=T}
 # Correlation between Vitamin and Week
 cor(x = df$VitaminaC, y = df$Setmana)
 ```
 
+```{r sum_treatment, echo=T}
+#summary of the data grouped by treatment
+summary(df %>% filter(Tractament == "a"))
+summary(df %>% filter(Tractament == "b"))
+summary(df %>% filter(Tractament == "c"))
+```
 
-<<<<<<< HEAD
-## 3)
-Is any treatment significantly better than the others in terms of VitC concentration?
-Does the Vitamin C concentration differ at packaging for different treatments?
-=======
 Thoughts :
 
 simple summary shows: Vitamin C concentration varies a lot,
@@ -84,16 +76,10 @@ summary of each treatment: treatment a and b are quite similar, c seems to diffe
 
 Possible questions :
 Is any treatment significantly better than the others?
->>>>>>> 9782c93305a8b28844656bac4862a2271bc1689a
 By how much does Vitamin C concentration decrease per week?
 
 
 
-<<<<<<< HEAD
-## 4)
-(1) First let us fit an exponential model that only considers the weeks.
-```{r 4.1}
-=======
 ## 4) (1) Fit a model with the assumption that the concentration of Vitamin C at the time of packaging (week 0) does not depend on the conservation method.
 ## - Report your estimations of the βi and interpret them in context.
 ## - Are the βi significantly different to each other or not? Interpret what it means that the βi are significantly different or not in context (i.e. how would you explain this to your point of contact at the juice company?).
@@ -110,25 +96,10 @@ With : $\alpha_i = e^{\beta_0.week}$
 
 
 ```{r 4.1, echo=F}
->>>>>>> 9782c93305a8b28844656bac4862a2271bc1689a
 mod1 = glm( VitaminaC ~ Setmana, data = df, family = "poisson" )
-alpha = exp(mod1[["coefficients"]][["(Intercept)"]])
-beta = mod1[["coefficients"]][["Setmana"]]
-exp.beta = exp(beta)
 summary(mod1)
-cbind(alpha, beta, exp.beta)
-```
-Here we only have one value each for alpha and beta as we do not consider different treatments. Alpha is interpreted as the predicted VitC concentration at week 0. Beta is best interpreted as follows: For each additional week the VitC concentration decreases by 1-exp.beta percent. In our case this means each week VitC concentration falls by 10.4 percent. Both alpha and beta are highly significant. Here we plotted the model:
-```{r}
-effect_plot(mod1, pred = Setmana, plot.points = T)
 ```
 
-<<<<<<< HEAD
-
-
-(2) Now let us fit a model that considers the weeks aswell as the treatment and the interaction between them:
-```{r 4.2}
-=======
 
 
 ## 4) (2) Fit a model with the assumption that the effect of week depends on the conservation method.
@@ -138,57 +109,26 @@ effect_plot(mod1, pred = Setmana, plot.points = T)
 We fit a multiplicative generalized linear model to the data taking the week of measurement and the conservation method as parameters.
 
 ```{r 4.2, echo=F}
->>>>>>> 9782c93305a8b28844656bac4862a2271bc1689a
 mod2 = glm( VitaminaC ~ Setmana*Tractament, data = df, family = "poisson" )
 summary(mod2)
-
-#creating array of different alpha values
-int = mod2[["coefficients"]][["(Intercept)"]]
-alpha = exp(c(int, int+mod2[["coefficients"]][["Tractamentb"]], int+mod2[["coefficients"]][["Tractamentc"]]))
-
-#creating array of different beta values
-set = mod2[["coefficients"]][["Setmana"]]
-beta = c(set, set+mod2[["coefficients"]][["Setmana:Tractamentb"]], set+mod2[["coefficients"]][["Setmana:Tractamentc"]])
-
-exp.beta = exp(beta)
-
-rbind(alpha,beta, exp.beta)
-
-```
-Now we have different alpha and beta values for each treatment. The interpretation is similar to above. The alpha values tell us the predicted VitC concentration at week 0 for each treatment. So alpha[1]=43.73 is the predicted VitC concentration for treatment A. The Betas are best interpreted as follows: For each additional week the VitC concentration decreases by 1-exp.beta percent. So we predict that each week the Vit C concentration falls by 1-exp.beta[1] = 12.17 percent for treatment A. Note that most of the interactions are not statistically significant. Only the influence of treatment C on the beta is significant. By statistically significant we mean that assuming the influence to be nothing it is very unlikely that we would observe the data the way it is. As we actually did observe the result we should reject the premise that the influence was zero. Below we plotted the model:
-
-```{r}
-interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T,
-              point.size = 3)
 ```
 
-<<<<<<< HEAD
-
-
-
-## 4
-=======
 INTERPRETATION OF THE $\beta_i$
 
 ## 5) Fit a model that does not assume that the treatments have the same Vitamin C concentration at the time of packaging. Then,
 ## - For each treatment, estimate the vitamin C concentration at the time of packaging.
 ## - Test whether there is evidence to claim that the treatments have different concentrations of Vitamin C at the time of packaging. Interpret your results.
->>>>>>> 9782c93305a8b28844656bac4862a2271bc1689a
 
 ```{r}
 
 ```
 
-<<<<<<< HEAD
-## 5)
-=======
 ## 6) Find the best normal linear model you can with a systematic component as in Equation (1). Use residual analysis to check that the assumptions of the model are satisfied. Explain how good your model is using metrics such as adjusted R^2, explaining what they mean in context.
 
 We can choose the best linear model by comparing the $R^2$, the mean square errors (MSE) and the Akaike Information Criterion (AIC)
 ```{r}
 bmod =
 ```
->>>>>>> 9782c93305a8b28844656bac4862a2271bc1689a
 
 ```{r}
 #Response residual
@@ -207,9 +147,6 @@ mean(df$resp_resid < 0)
 ```
 
 
-<<<<<<< HEAD
-## 6)
-=======
 ```{r}
 #Pearson residual
 df$resp_resid = residuals(bmod, type = "pearson")
@@ -230,4 +167,3 @@ ggplot(df) +
 For interpretation check Lec7_sol.html
 
 ## 7) Explain the main conclusions of your analysis in approximately half a page. In particular, answer the questions you asked yourself in part 3). Keep technical jargon to a minimum: your conclusions should be understood by your point of contact at the juice company, who may not know or like statistics all that much.
->>>>>>> 9782c93305a8b28844656bac4862a2271bc1689a
