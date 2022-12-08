@@ -2,6 +2,8 @@
 library(ggplot2)
 library(tidyverse)
 library(dplyr)
+library(interactions)
+library(jtools)
 
 jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
 ema = "your path"
@@ -16,6 +18,8 @@ rm(jakob,ema)
 
 #summary
 summary(df)
+df %>% count(Tractament)
+df %>% count(Setmana)
 
 #simple point plot of data
 ggplot(data = df) +
@@ -56,7 +60,10 @@ summary(df %>% filter(Tractament == "c"))
 # (1)
 mod1 = glm( VitaminaC ~ Setmana, data = df, family = "poisson" )
 summary(mod1)
+effect_plot(mod1, pred = Setmana, plot.points = T)
 
 # (2)
 mod2 = glm( VitaminaC ~ Setmana*Tractament, data = df, family = "poisson" )
 summary(mod2)
+interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T,
+              point.size = 3)
