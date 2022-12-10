@@ -23,6 +23,7 @@ jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Gener
 ema = "C:/Users/emaca/OneDrive/Documents/INSA/4A/Linear and Generalized Linear Models/Assignment/VitCGroup7.csv"
 
 df = read.csv2(jakob)
+df$pred = log(df$VitaminaC)
 rm(jakob,ema)
 ```
 
@@ -64,69 +65,58 @@ By how much does Vitamin C concentration decrease per week?
 
 
 
-## 4.1)
-To answer this question, we fit a generalized linear model to the data taking only the week of measurement as parameter. We use Poisson's family to fit the data and we consider $\beta_0$ as the intercept.
-
+## 4)
+To answer this question, we fit a linear model to the data. As we assume the VitC concentration to be equal at the time of packaging but we are still interested in the effect of the treatment we fit the model with an interaction term but exclude the treatment itself. In mathematical terms this means that we have different $\beta$ for each treatment but our $\alpha$ is the same.
 $$
-VitaminC_i = e^{\beta_0 + \beta .week} = \alpha e^{\beta .week}
+VitaminC_i = \alpha e^{\beta_i .week}
 $$
-With : $\alpha = e^{\beta_0}$ and $\beta_0$ the intercept.
-
+With $i \in \{a,b,c\}$ for each treatment.
 
 ```{r 4.1}
-mod1 = glm( VitaminaC ~ Setmana, data = df, family = "poisson" )
-alpha = exp(mod1[["coefficients"]][["(Intercept)"]])
-beta = mod1[["coefficients"]][["Setmana"]]
-exp.beta = exp(beta)
+mod1 = lm( pred ~ Setmana * Tractament -Tractament, data = df)
 summary(mod1)
-cbind(alpha, beta, exp.beta)
 ```
-Here we only have one value each for alpha and beta as we do not consider different treatments. Alpha is interpreted as the predicted VitC concentration at week 0. Beta is best interpreted as follows: For each additional week the VitC concentration decreases by 1-exp.beta percent. In our case this means each week VitC concentration falls by 10.4 percent. Both alpha and beta are highly significant. Here we plotted the model:
+We can see that the time and the treatment c appear to have a significant effect on the Vitamin C concentration. Let us check that our intercept is actually the same for each treatment. We do this by predicting 3 observations each with week being zero and one for each treatment.
 ```{r}
-effect_plot(mod1, pred = Setmana, plot.points = T)
+pr.df = data.frame(Setmana = c(0,0,0), Tractament = c("a", "b", "c"))
+predict(mod1, pr.df)
 ```
-
-
-
-## 4.2)
-We fit a multiplicative generalized linear model to the data taking the week of measurement and the conservation method as parameters. This model will also consider the interactions between our predictors.
-
-$$
-VitaminC_i = e^{\gamma_i + \beta_i .week} = \alpha_i e^{\beta_i .week}
-$$
-With $i \in \{1,2,3\}$ for each treatment.
-
-```{r 4.2}
-mod2 = glm( VitaminaC ~ Setmana*Tractament, data = df, family = "poisson" )
-summary(mod2)
-
-#creating array of different alpha values
-int = mod2[["coefficients"]][["(Intercept)"]]
-alpha = exp(c(int, int+mod2[["coefficients"]][["Tractamentb"]], int+mod2[["coefficients"]][["Tractamentc"]]))
-
-#creating array of different beta values
-set = mod2[["coefficients"]][["Setmana"]]
-beta = c(set, set+mod2[["coefficients"]][["Setmana:Tractamentb"]], set+mod2[["coefficients"]][["Setmana:Tractamentc"]])
-
-exp.beta = exp(beta)
-
-rbind(alpha,beta, exp.beta)
-
-```
-Now we have different alpha and beta values for each treatment. The interpretation is similar to above. The alpha values tell us the predicted VitC concentration at week 0 for each treatment. So alpha[1]=43.73 is the predicted VitC concentration for treatment A. The Betas are best interpreted as follows: For each additional week the VitC concentration decreases by 1-exp.beta percent. So we predict that each week the Vit C concentration falls by 1-exp.beta[1] = 12.17 percent for treatment A. Note that most of the interactions are not statistically significant. Only the influence of treatment C on the beta is significant. By statistically significant we mean that assuming the influence to be nothing it is very unlikely that we would observe the data the way it is. As we actually did observe the result we should reject the premise that the influence was zero. Below we plotted the model:
-
+Not let us plot our model so that we can get an understanding of what it looks like:
 ```{r}
-interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T,
-              point.size = 3)
+interact_plot(mod1, pred = Setmana, modx = Tractament, plot.points = T)
 ```
-
-INTERPRETATION OF THE $\beta_i$
+In this model we find that $\alpha = 47.61488$ and $\beta[a,b,c] = [-0.1423, -0.1455, -0.0752]$. The betas are best interpreted if we take the exponential of them and we get: $e^{\beta[a,b,c]} = [0.8674, 0.8646, 0.9276]$. These are the factors we will multiply our VitC Concentration with each week. For example lets consider treatment a: each week the concentration will fall by $1-e^{\beta[a]} = 13.26\%$.
 
 ## 5)
-
+We want to fit a model that does not assume that the treatments have the same Vitamin C concentration at the time of packaging. Thus a linear model that for each slope has a different slope and intercept.
+$$
+VitaminC_i = \alpha_i e^{\beta_i .week}
+$$
+With $i \in \{a,b,c\}$ for each treatment.
 ```{r}
-
+mod2 = lm( pred ~ Setmana * Tractament, data = df)
+summary(mod2)
 ```
+We can see in the summary that most values are significant at $\alpha = 0.05$ except for the treatment C. For week zero we would predict the following levels of Vitamin C concentration for different treatments.
+```{r}
+A = mod2[["coefficients"]][["(Intercept)"]]
+B = A + mod2[["coefficients"]][["Tractamentb"]]
+C = A + mod2[["coefficients"]][["Tractamentc"]]
+A = exp(A)
+B = exp(B)
+C = exp(C)
+cbind(A,B,C)
+```
+Now let us have a look at a plot that shows our fitted model for each treatment
+```{r}
+interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T)
+```
+Lastly we want to check whether there is evidence to claim that the treatments have different concentrations of Vitamin C at the time of packaging. We do this by that by assuming the anova method:
+```{r}
+anova(mod2)
+```
+We can clearly see that the variable Tractament is highly significant. This indicates that indeed that different treatments lead to a different concentration of VitC at the time of packaging.
+
 
 ## 6)
 

@@ -16,6 +16,9 @@ rm(jakob,ema)
 #--------------------------------------------------------------------#
 # 2
 
+#add a column for the log of vitamin C
+df$pred = log(df$VitaminaC)
+
 #summary
 summary(df)
 df %>% count(Tractament)
@@ -25,6 +28,12 @@ df %>% count(Setmana)
 ggplot(data = df) +
   aes(x = Setmana, y = VitaminaC, color = Tractament) +
     geom_point()
+
+# simple point plot of predictor value
+ggplot(data = df) +
+  aes(x = Setmana, y = pred, color = Tractament) +
+  geom_point()
+
 
 # Correlation between Vitamin and Week
 cor(x = df$VitaminaC, y = df$Setmana)
@@ -56,14 +65,29 @@ summary(df %>% filter(Tractament == "c"))
 #--------------------------------------------------------------------#
 
 #4
-
-# (1)
-mod1 = glm( VitaminaC ~ Setmana, data = df, family = "poisson" )
+mod1 = lm( pred ~ Setmana * Tractament -Tractament, data = df)
 summary(mod1)
-effect_plot(mod1, pred = Setmana, plot.points = T)
+interact_plot(mod1, pred = Setmana, modx = Tractament, plot.points = T)
+anova(mod1)
+pr.df = data.frame(Setmana = c(0,0,0), Tractament = c("a", "b", "c"))
+predict(mod1, pr.df)
 
-# (2)
-mod2 = glm( VitaminaC ~ Setmana*Tractament, data = df, family = "poisson" )
+
+
+
+# 5
+mod2 = lm( pred ~ Setmana * Tractament, data = df)
 summary(mod2)
-interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T,
-              point.size = 3)
+interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T)
+anova(mod2)
+
+A = mod2[["coefficients"]][["(Intercept)"]]
+B = A + mod2[["coefficients"]][["Tractamentb"]]
+C = A + mod2[["coefficients"]][["Tractamentc"]]
+A = exp(A)
+B = exp(B)
+C = exp(C)
+print("Expected VitC Concentration at packaging for different treatments")
+cbind(A,B,C)
+
+
