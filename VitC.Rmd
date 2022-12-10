@@ -88,6 +88,15 @@ interact_plot(mod1, pred = Setmana, modx = Tractament, plot.points = T)
 ```
 In this model we find that $\alpha = 47.61488$ and $\beta[a,b,c] = [-0.1423, -0.1455, -0.0752]$. The betas are best interpreted if we take the exponential of them and we get: $e^{\beta[a,b,c]} = [0.8674, 0.8646, 0.9276]$. These are the factors we will multiply our VitC Concentration with each week. For example lets consider treatment a: each week the concentration will fall by $1-e^{\beta[a]} = 13.26\%$.
 
+\
+Finally let us check whether the betas are significantly diferent from eachother. We can do this by checking the anova table.
+
+```{r}
+anova(mod1)
+```
+
+We see that the interaction "Setmana:Tractament" is highly significant. This indicates that the betas are indeed different from eachother.
+
 ## 5)
 We want to fit a model that does not assume that the treatments have the same Vitamin C concentration at the time of packaging. Thus a linear model that for each slope has a different slope and intercept.
 $$
@@ -108,10 +117,13 @@ B = exp(B)
 C = exp(C)
 cbind(A,B,C)
 ```
+
 Now let us have a look at a plot that shows our fitted model for each treatment
+
 ```{r}
 interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T)
 ```
+
 Lastly we want to check whether there is evidence to claim that the treatments have different concentrations of Vitamin C at the time of packaging. We do this by that by assuming the anova method:
 ```{r}
 anova(mod2)
