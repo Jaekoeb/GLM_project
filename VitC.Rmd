@@ -15,6 +15,7 @@ library(tidyverse)
 library(dplyr)
 library(interactions)
 library(jtools)
+library(MuMIn)
 ```
 
 Text
@@ -22,7 +23,7 @@ Text
 jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
 ema = "C:/Users/emaca/OneDrive/Documents/INSA/4A/Linear and Generalized Linear Models/Assignment/VitCGroup7.csv"
 
-df = read.csv2(jakob)
+df = read.csv2(ema)
 df$pred = log(df$VitaminaC)
 rm(jakob,ema)
 ```
@@ -120,45 +121,44 @@ We can clearly see that the variable Tractament is highly significant. This indi
 
 ## 6)
 
-<!-- We can choose the best linear model by comparing the $R^2$, the mean square errors (MSE) and the Akaike Information Criterion (AIC) -->
-<!-- ```{r} -->
-<!-- bmod =  -->
-<!-- ``` -->
+We can choose the best linear model by comparing the Akaike Information Criterion (AIC). We use the function "dredge" from the package "MuMIn" to rank all the possible models by their AIC
+```{r}
+options(na.action="na.fail")
+all_lm <- lm(pred ~ Setmana + Tractament, data = df)
+dredge(all_lm,rank = "AIC")
+```
+We choose the model with the lowest AIC ie.the model considering that the concentration of vitamin C depends both on the week of measurement and on the treatment. It's AIC is equal to -35.0.
 
-<!-- ```{r} -->
-<!-- #Response residual -->
-<!-- df$resp_resid = residuals(bmod, type = "response") -->
-<!-- ggplot(df) + -->
-<!--   aes(x = resp_resid) + -->
-<!--     geom_histogram() -->
-<!-- ``` -->
+```{r}
+bmod = lm(pred ~ Setmana + Tractament,data=df)
+```
 
-<!-- ```{r} -->
-<!-- mean(df$resp_resid > 0) -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- mean(df$resp_resid < 0) -->
-<!-- ``` -->
+We check if the assumptions of regression (linearity, independence of errors, normality of errors and homoscedasticity) are satisfied with a residual analysis.
 
 
-<!-- ```{r} -->
-<!-- #Pearson residual -->
-<!-- df$resp_resid = residuals(bmod, type = "pearson") -->
-<!-- ggplot(df) + -->
-<!--   aes(x = resp_resid) + -->
-<!--     geom_histogram() -->
-<!-- ``` -->
+```{r}
+#Residual analysis for linearity
+
+#Standard residual
+plot(rstandard(bmod))
+abline(h=c(-2,0,2),lty=2)
+```
+```{r}
+#Studentized residual
+plot(rstudent(bmod))
+abline(h=c(-2,0,2),lty=2)
+```
+We see that both residuals plots leads to the conclusion that all the assumptions are satisfied :
+- Most of the residuals are in of the interval [-2,2] (only 4 residuals are out) which confirms the assumptions of linearity, normality of errors and homoscedasticity are satisfied.
+- We don't see any particular pattern for both plots so we consider that the independence of errors assumption is satisfied.
 
 
-<!-- ```{r} -->
-<!-- #Deviance residual -->
-<!-- df$resp_resid = residuals(bmod) -->
-<!-- ggplot(df) + -->
-<!--   aes(x = resp_resid) + -->
-<!--     geom_histogram() -->
-<!-- ``` -->
+```{r}
+#Adjusted R^2
+summary(bmod)
+```
+The adjusted R-squared is equal to  0.868, it means that the model explains 86.8% of the fluctuation in Vitamin C, which is a sufficient proportion. The residual standard error being low (equal to 0.1822)g which means that the values of the residuals are pretty close to each other. Moreover, the null hypothesis of the omnibus test is clearly rejected (p-value < 0.05), our "best model" have a way better fit to the data than the null model because the explanatory variables play a huge role in the variability of the vitamin C.
 
-<!-- For interpretation check Lec7_sol.html -->
+
 
 ## 7)
