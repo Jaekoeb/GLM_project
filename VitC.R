@@ -65,9 +65,12 @@ summary(df %>% filter(Tractament == "c"))
 #--------------------------------------------------------------------#
 
 #4
-
-# (1)
-
+mod1 = lm( pred ~ Setmana * Tractament -Tractament, data = df)
+summary(mod1)
+interact_plot(mod1, pred = Setmana, modx = Tractament, plot.points = T)
+anova(mod1)
+pr.df = data.frame(Setmana = c(0,0,0), Tractament = c("a", "b", "c"))
+predict(mod1, pr.df)
 
 
 
@@ -77,7 +80,6 @@ mod2 = lm( pred ~ Setmana * Tractament, data = df)
 summary(mod2)
 interact_plot(mod2, pred = Setmana, modx = Tractament, plot.points = T)
 anova(mod2)
-Anova(mod2)
 
 A = mod2[["coefficients"]][["(Intercept)"]]
 B = A + mod2[["coefficients"]][["Tractamentb"]]
