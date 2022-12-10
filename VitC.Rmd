@@ -5,11 +5,11 @@ date: "2022-12-02"
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = T, warning = FALSE)
 ```
 
 
-```{r lib}
+```{r lib, message=FALSE}
 library(ggplot2)
 library(tidyverse)
 library(dplyr)
@@ -18,7 +18,6 @@ library(jtools)
 library(MuMIn)
 ```
 
-Text
 ```{r load_data}
 jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
 ema = "C:/Users/emaca/OneDrive/Documents/INSA/4A/Linear and Generalized Linear Models/Assignment/VitCGroup7.csv"
@@ -28,17 +27,13 @@ df$pred = log(df$VitaminaC)
 rm(jakob,ema)
 ```
 
-## 1)
-
-Outcome : Concentration of vitamin C in the orange juice
+**1)** REDAC Outcome : Concentration of vitamin C in the orange juice
 
 Predictors : 
 - Conservation method (column "Tractament" : a, b or c) which is a categorical variable
 - Week of measurement (column "Setmana" from 1 to 12) 
 
-## 2)
-
-The data is very evenly spread out, with each week containing 6 observations and each treatment containing 24 observations. Generally we can see that Vitamin C concentration varies a lot. For example the maximum is 5 times the minimum value. Also the interquartile range is 17.22 which is quite high considering the magnitude of values involved.
+**2)** The data is very evenly spread out, with each week containing 6 observations and each treatment containing 24 observations. Generally we can see that Vitamin C concentration varies a lot. For example the maximum is 5 times the minimum value. Also the interquartile range is 17.22 which is quite high considering the magnitude of values involved.
 ```{r sum}
 summary(df$VitaminaC)
 ```
@@ -58,16 +53,12 @@ The correlation between the Vitamin C concentration and the time in weeks is a s
 # Correlation between Vitamin and Week
 cor(x = df$VitaminaC, y = df$Setmana)
 ```
-
-## 3)
-Is any treatment significantly better than the others in terms of VitC concentration?
+**3)** REDAC Is any treatment significantly better than the others in terms of VitC concentration?
 Does the Vitamin C concentration differ at packaging for different treatments?
 By how much does Vitamin C concentration decrease per week?
 
 
-
-## 4)
-To answer this question, we fit a linear model to the data. As we assume the VitC concentration to be equal at the time of packaging but we are still interested in the effect of the treatment we fit the model with an interaction term but exclude the treatment itself. In mathematical terms this means that we have different $\beta$ for each treatment but our $\alpha$ is the same.
+**4)** To answer this question, we fit a linear model to the data. As we assume the VitC concentration to be equal at the time of packaging but we are still interested in the effect of the treatment we fit the model with an interaction term but exclude the treatment itself. In mathematical terms this means that we have different $\beta$ for each treatment but our $\alpha$ is the same.
 $$
 VitaminC_i = \alpha e^{\beta_i .week}
 $$
@@ -97,8 +88,7 @@ anova(mod1)
 
 We see that the interaction "Setmana:Tractament" is highly significant. This indicates that the betas are indeed different from eachother.
 
-## 5)
-We want to fit a model that does not assume that the treatments have the same Vitamin C concentration at the time of packaging. Thus a linear model that for each slope has a different slope and intercept.
+**5)** We want to fit a model that does not assume that the treatments have the same Vitamin C concentration at the time of packaging. Thus a linear model that for each slope has a different slope and intercept.
 $$
 VitaminC_i = \alpha_i e^{\beta_i .week}
 $$
@@ -131,9 +121,7 @@ anova(mod2)
 We can clearly see that the variable Tractament is highly significant. This indicates that indeed that different treatments lead to a different concentration of VitC at the time of packaging.
 
 
-## 6)
-
-We can choose the best linear model by comparing the Akaike Information Criterion (AIC). We use the function "dredge" from the package "MuMIn" to rank all the possible models by their AIC
+**6)** We can choose the best linear model by comparing the Akaike Information Criterion (AIC). We use the function "dredge" from the package "MuMIn" to rank all the possible models by their AIC
 ```{r}
 options(na.action="na.fail")
 all_lm <- lm(pred ~ Setmana + Tractament, data = df)
@@ -173,4 +161,4 @@ The adjusted R-squared is equal to  0.868, it means that the model explains 86.8
 
 
 
-## 7)
+**7)**
