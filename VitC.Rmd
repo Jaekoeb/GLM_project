@@ -1,7 +1,8 @@
 ---
-title: "Vitc"
+title: "VitC Group 7 - Practical Assignment"
+author: "Ema Cadaux, Jakob Pertl"
 output: html_document
-date: "2022-12-02"
+date: "11.12.2022"
 ---
 
 ```{r setup, include=FALSE}
@@ -9,7 +10,7 @@ knitr::opts_chunk$set(echo = T, warning = FALSE)
 ```
 
 
-```{r lib, message=FALSE}
+```{r lib, message=FALSE, echo=F}
 library(ggplot2)
 library(tidyverse)
 library(dplyr)
@@ -18,7 +19,7 @@ library(jtools)
 library(MuMIn)
 ```
 
-```{r load_data}
+```{r load_data, echo=F}
 jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
 ema = "C:/Users/emaca/OneDrive/Documents/INSA/4A/Linear and Generalized Linear Models/Assignment/VitCGroup7.csv"
 
@@ -50,10 +51,10 @@ ggplot(data = df) +
     geom_point()
 ```
 
-The correlation between the Vitamin C concentration and the time in weeks is a strong negative correlation at -0.86. This confirms our eyeballed observation earlier.
+The correlation between the Vitamin C concentration and the time in weeks is a strong negative correlation at -0.7042. This confirms our eyeballed observation earlier.
 ```{r cor}
 # Correlation between Vitamin and Week
-cor(x = df$VitaminaC, y = df$Setmana)
+cor(x = df$VitaminaC, y = df$Setmana, method = "kendall")
 ```
 \
 **3)**  The questions of the juice company that will be covered by our analysis are :\
@@ -92,7 +93,7 @@ Finally let us check whether the betas are significantly diferent from eachother
 anova(mod1)
 ```
 
-We see that the interaction "Setmana:Tractament" is highly significant. This indicates that the betas are indeed different from eachother. We want to provide a little more detail to the meaning of "highly significant". What we were doing here is an F-Test. First we assume, under the 0-hypothesis, that the effect of the treatment on the week is 0. Then we ask ourselves, under this condition what is the probability of observing the outcome of our data (and technically every more extreme outcome). This is the famous p-value which is 2.2e-16. Thus it is very unlikely to observe the outcome we got, given there is no effect. Following we reject the 0-hypothesis and cans say that the effect is non-zero.
+We see that the interaction "Setmana:Tractament" is highly significant. This indicates that the betas are indeed different from eachother. We want to provide a little more detail to the meaning of "highly significant". What we were doing here is an F-Test. First we assume, under the 0-hypothesis, that the effect of the treatment on the week is 0. Then we ask ourselves, under this condition what is the probability of observing the outcome of our data (and technically every more extreme outcome). This is the famous p-value which is 2.2e-16. Thus it is very unlikely to observe the outcome we got, given there is no effect. Following we reject the 0-hypothesis and can say that the effect is non-zero.
 
 
 
