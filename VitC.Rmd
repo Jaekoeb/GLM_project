@@ -1,8 +1,10 @@
 ---
 title: "VitC Group 7 - Practical Assignment"
-author: "Ema Cadaux, Jakob Pertl"
-output: html_document
+author: "Ema Cadaux and Jakob Pertl"
 date: "11.12.2022"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,7 +25,7 @@ library(MuMIn)
 jakob = "C:/Users/pertl/Desktop/Studium Mathematik/7. Barcelona/Linear and Generalized Models/Practical Exercise/VitCGroup7.csv"
 ema = "C:/Users/emaca/OneDrive/Documents/INSA/4A/Linear and Generalized Linear Models/Assignment/VitCGroup7.csv"
 
-df = read.csv2(jakob)
+df = read.csv2(ema)
 df$pred = log(df$VitaminaC)
 rm(jakob,ema)
 ```
@@ -41,7 +43,7 @@ The predictors are : \
 summary(df$VitaminaC)
 ```
 
-A plot of the data shows that there seems to be a decrease VitC concentration over time. Treatment A and B appear to yield very similar results, while treatment C seems to yield higher VitC concentrations.\
+A plot of the data shows that there seems to be a decrease VitC concentration over time. Treatment a and a appear to yield very similar results, while treatment c seems to yield higher VitC concentrations.\
 - The vitamin C concentration with treatment a and b decreases linearly as the weeks pass by. \
 - Treatment c seems to maintain a higher concentration than a and b after the 4th week. \
 ```{r plt_data}
@@ -132,7 +134,7 @@ We can clearly see that the variable Tractament is highly significant. This inde
 
 
 
-**6)** We can choose the best linear model by comparing the Akaike Information Criterion (AIC). We use the function "dredge" from the package "MuMIn" to rank all the possible models by their AIC
+**6)** We can choose the best linear model by comparing the Akaike Information Criterion (AIC). We use the function "dredge" from the package "MuMIn" to rank all the possible models by their AIC.
 ```{r}
 options(na.action="na.fail")
 all_lm <- lm(pred ~ Setmana + Tractament, data = df)
@@ -148,8 +150,7 @@ We check if the assumptions of regression (linearity, independence of errors, no
 
 
 ```{r}
-#Residual analysis for linearity
-
+##Residual analysis to test assumptions
 #Standard residual
 plot(rstandard(bmod))
 abline(h=c(-2,0,2),lty=2)
@@ -160,8 +161,8 @@ plot(rstudent(bmod))
 abline(h=c(-2,0,2),lty=2)
 ```
 \
-We see that both residuals plots leads to the conclusion that all the assumptions are satisfied :\
-- Most of the residuals are in of the interval [-2,2] (only 4 residuals are out) which confirms the assumptions of linearity, normality of errors and homoscedasticity are satisfied.\
+We see that both residuals plots lead to the conclusion that all the assumptions are satisfied :\
+- Most of the residuals are in of the interval [-2,2] (only 4 residuals are out) which confirms that the assumptions of linearity, normality of errors and homoscedasticity are satisfied.\
 - We don't see any particular pattern for both plots so we consider that the independence of errors assumption is satisfied.
 
 
@@ -169,7 +170,7 @@ We see that both residuals plots leads to the conclusion that all the assumption
 #Adjusted R^2
 summary(bmod)
 ```
-The adjusted R-squared is equal to  0.868, it means that the model explains 86.8% of the fluctuation in Vitamin C, which is a sufficient proportion. The residual standard error being low (equal to 0.1822)g which means that the values of the residuals are pretty close to each other. Moreover, the null hypothesis of the omnibus test is clearly rejected (p-value < 0.05), our "best model" have a way better fit to the data than the null model because the explanatory variables play a huge role in the variability of the vitamin C.
+The adjusted R-squared is equal to  0.868, it means that the model explains 86.8% of the fluctuation in Vitamin C, which is a sufficient proportion. The residual standard error being low (equal to 0.1822) which means that the values of the residuals are pretty close to each other. Moreover, the null hypothesis of the omnibus test is clearly rejected (p-value < 0.05), our "best model" have a way better fit to the data than the null model because the explanatory variables play a huge role in the variability of the vitamin C.
 
 
 
@@ -181,12 +182,12 @@ Our analysis of the dataset provided led to the answers of the following questio
 - Is there a treatment better than the 2 others in maintaining a high Vitamin C concentration? \
 - Are the effects of the week of measurement and the type of treatment on the vitamin C concentration correlated? 
 
-In the following line, the term "parameters" will refer to both week of measurement and type of treatment.
+In the following lines, the term "parameters" will refer to both week of measurement and type of treatment.\
 The analysis we made consisted first on a data analysis that led us to understand the effect of the parameters on the Vitamin C concentration, then, we fitted linear models to the data to better understand the relationships between the effects of the different parameters.
 
 By observing the data, we notice that it is evenly spread out : there is 6 observations for each week of measurement and 24 observations for each treatment. In overall, the Vitamin C concentration varies a lot depending on the treatment and on the week. This is highlighted by the fact that the highest vitamin C concentration is 5 times the lowest one.
 
-Performing the data analysis, we concluded  that the Vitamin C concentration decreases linearly over time by studying the correlation between these two variables. With treatment a and b, the concentrations  decreases linearly as the weeks pass by. Besides, treatment C leads to higher concentrations than treatment a and b after the 4th week.
+Performing the data analysis, we concluded  that the Vitamin C concentration decreases over time by studying the correlation between these two variables. With treatment a and b, the concentrations  decreases linearly as the weeks pass by. Besides, treatment C leads to higher concentrations than treatment a and b after the 4th week.
 
 
 We then fitted a normal linear model to the data to study the effect of the different treatments assuming the Vitamin C concentrations to be equal at the time of packaging.
@@ -195,7 +196,7 @@ We then estimated the $\beta_i$, they are factors that represents the effects of
 
 We also fitted a a normal linear model to the data assuming that the treatments doesn't have the same Vitamin C concentration at the time of packaging. By doing that, our goal was to estimate the vitamin C concentration at the time of packaging. This initial concentration is similar for treatment a and c (around 47) and higher for treatment b (around 52.5). Therefore, we conclude that different treatments lead to a different concentration of vitamin C at the time of packaging.
  
-Finally, we studied all possible normal linear models to find the one that fit the best our data. We came to the conclusion that both the week of measurement and the treatment have a significant effect on the vitamin C concentration. If ones wants to maintain a high vitamin C concentration in the juice, it is important to choose the treatment that will lead to a higher results overtime (i.e. Treatment c). However, the time when it will be consumed shouldn't be neglected.
+Finally, we studied all possible normal linear models to find the one that fit the best our data. We came to the conclusion that both the week of measurement and the treatment have a significant effect on the vitamin C concentration. If ones wants to maintain a high vitamin C concentration in the juice, it is important to choose the treatment that will lead to a higher results overtime (i.e. Treatment c). However, the time when it will be consumed shouldn't be neglected either.
  
 
 
